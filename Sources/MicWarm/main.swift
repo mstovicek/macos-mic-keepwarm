@@ -37,11 +37,11 @@ func getStringProperty(_ objectID: AudioObjectID, selector: AudioObjectPropertyS
     var address = AudioObjectPropertyAddress(mSelector: selector,
                                               mScope: kAudioObjectPropertyScopeGlobal,
                                               mElement: kAudioObjectPropertyElementMain)
-    var name: CFString = "" as CFString
-    var size = UInt32(MemoryLayout<CFString>.size)
+    var name: Unmanaged<CFString>? = nil
+    var size = UInt32(MemoryLayout<Unmanaged<CFString>?>.size)
     let status = AudioObjectGetPropertyData(objectID, &address, 0, nil, &size, &name)
-    guard status == noErr else { return nil }
-    return name as String
+    guard status == noErr, let name else { return nil }
+    return name.takeRetainedValue() as String
 }
 
 func getAllAudioDeviceIDs() -> [AudioDeviceID] {

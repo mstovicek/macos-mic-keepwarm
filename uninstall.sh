@@ -42,13 +42,3 @@ if [ -d "/Applications/Mic Warm.app" ]; then
     rm -rf "/Applications/Mic Warm.app"
     echo "Removed Mic Warm.app."
 fi
-
-# Also clean up old locations if present
-if [ -d "$HOME/Applications/Mic Warm.app" ]; then
-    rm -rf "$HOME/Applications/Mic Warm.app"
-    echo "Removed ~/Applications/Mic Warm.app."
-fi
-if [ -d "$HOME/Applications/mic-warm-app.app" ]; then
-    rm -rf "$HOME/Applications/mic-warm-app.app"
-    echo "Removed ~/Applications/mic-warm-app.app."
-fi

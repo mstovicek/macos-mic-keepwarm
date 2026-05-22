@@ -85,7 +85,7 @@ When you connect or disconnect AirPods, a Bluetooth headset, or any audio device
 | **UI** | None | Menu bar icon with toggle |
 | **Control** | Always on, `launchctl` to stop | Click to turn on/off |
 | **State** | Restarts automatically | Remembers last on/off state |
-| **Install** | `install.sh` (pre-built binary) | `install-dev.sh` (builds from source) |
+| **Install** | `install.sh` (pre-built binary) | `install-app.sh` (pre-built) or `install-dev.sh` (build from source) |
 
 Both use the same underlying session logic. Choose the daemon if you want zero overhead and never need to toggle. Choose the menu bar app if you want to turn it off occasionally (e.g. when Bluetooth audio quality matters more than push-to-talk latency).
 

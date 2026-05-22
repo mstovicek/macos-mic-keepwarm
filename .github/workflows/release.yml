@@ -14,20 +14,38 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Build universal binary
+      - name: Generate app icon
+        run: swift generate-icon.sh
+
+      - name: Build universal binaries
         run: swift build -c release --arch arm64 --arch x86_64
 
       - name: Ad-hoc sign
-        run: codesign --force --sign - .build/apple/Products/Release/mic-warm
+        run: |
+          codesign --force --sign - .build/apple/Products/Release/mic-warm
+          codesign --force --sign - .build/apple/Products/Release/mic-warm-app
 
       - name: Run integration tests
         run: ./test.sh
 
-      - name: Prepare binary
-        run: cp .build/apple/Products/Release/mic-warm mic-warm
+      - name: Prepare binaries
+        run: |
+          # Daemon: bare binary (no UI, correct format for background daemon)
+          cp .build/apple/Products/Release/mic-warm mic-warm
+
+          # Menu bar app: assemble .app bundle
+          mkdir -p "Mic Warm.app/Contents/MacOS"
+          mkdir -p "Mic Warm.app/Contents/Resources"
+          cp .build/apple/Products/Release/mic-warm-app "Mic Warm.app/Contents/MacOS/mic-warm-app"
+          cp Sources/MicWarmApp/Info.plist "Mic Warm.app/Contents/Info.plist"
+          cp Sources/MicWarmApp/Resources/AppIcon.icns "Mic Warm.app/Contents/Resources/AppIcon.icns"
+          codesign --force --sign - "Mic Warm.app"
+          zip -r mic-warm-app.zip "Mic Warm.app"
 
       - name: Create release
         uses: softprops/action-gh-release@v2
         with:
-          files: mic-warm
+          files: |
+            mic-warm
+            mic-warm-app.zip
           generate_release_notes: true

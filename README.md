@@ -78,22 +78,55 @@ When you connect or disconnect AirPods, a Bluetooth headset, or any audio device
 - Auto-recovery from Bluetooth disconnects, coreaudiod restarts, and stalled sessions
 - **Bluetooth audio note:** holding the mic open on AirPods/Bluetooth keeps the connection in SCO (telephony) mode, which slightly reduces output audio quality. This is a Bluetooth protocol limitation, not specific to mic-warm. Any app using the mic causes the same behavior.
 
+## Two Flavors
+
+| | `mic-warm` (daemon) | `mic-warm-app` (menu bar) |
+|---|---|---|
+| **UI** | None | Menu bar icon with toggle |
+| **Control** | Always on, `launchctl` to stop | Click to turn on/off |
+| **State** | Restarts automatically | Remembers last on/off state |
+| **Install** | `install.sh` (pre-built binary) | `install-app.sh` (pre-built) or `install-dev.sh` (build from source) |
+
+Both use the same underlying session logic. Choose the daemon if you want zero overhead and never need to toggle. Choose the menu bar app if you want to turn it off occasionally (e.g. when Bluetooth audio quality matters more than push-to-talk latency).
+
 ## Installation
+
+### Option A — Daemon (original, pre-built)
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/drewburchfield/macos-mic-keepwarm/master/install.sh | bash
 ```
 
-This downloads a precompiled universal binary (ARM + Intel), installs it to `~/.local/bin/mic-warm`, and creates a LaunchAgent that:
+Downloads a precompiled universal binary (ARM + Intel), installs it to `~/.local/bin/mic-warm`, and creates a LaunchAgent that:
 - Starts automatically on login
 - Restarts automatically if killed
-- Runs silently in the background
+- Runs silently in the background with no UI
 
 macOS will prompt you to grant mic-warm microphone access. Go to System Settings > Privacy & Security > Microphone and allow it.
 
+### Option B — Menu bar app (pre-built)
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/drewburchfield/macos-mic-keepwarm/master/install-app.sh | bash
+```
+
+Downloads the precompiled universal binary, installs it to `~/.local/bin/mic-warm-app`, and creates a LaunchAgent with the same auto-start/restart behavior as the daemon.
+
+**Or build from source** (requires Xcode Command Line Tools — `xcode-select --install`):
+
+```bash
+git clone https://github.com/drewburchfield/macos-mic-keepwarm.git
+cd macos-mic-keepwarm
+bash install-dev.sh
+```
+
+The menu bar icon shows `mic.fill` when warm and `mic.slash.fill` when cold. Click it to toggle, or open the menu to see the current state and quit.
+
 ### Upgrade
 
-To upgrade, re-run the install command. The script re-signs the binary and reloads the LaunchAgent. Don't replace the binary manually, as macOS tracks microphone permissions by code signature and will silently reject an unsigned replacement.
+**Daemon:** re-run `install.sh`. The script re-signs the binary and reloads the LaunchAgent. Don't replace the binary manually — macOS tracks mic permissions by code signature and will silently reject an unsigned replacement.
+
+**Menu bar app:** re-run `install-app.sh` (or `install-dev.sh` if you built from source).
 
 ### Uninstall
 
@@ -123,13 +156,13 @@ You don't need one. BlackHole, Loopback, and SoundFlower create virtual audio ro
 
 ## Testing
 
-Run the integration test suite to verify process lifecycle, signal handling, and PID file management:
+Run the integration test suite to verify process lifecycle, signal handling, and PID file management (targets the `mic-warm` daemon):
 
 ```bash
 ./test.sh
 ```
 
-Device-switching tests require real audio hardware and should be done manually.
+Device-switching tests require real audio hardware and should be done manually. For `mic-warm-app`, manually verify that the menu bar icon updates correctly when toggling and when AirPods connect or disconnect.
 
 ## Legacy Shell Script
 

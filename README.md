@@ -104,7 +104,15 @@ Downloads a precompiled universal binary (ARM + Intel), installs it to `~/.local
 
 macOS will prompt you to grant mic-warm microphone access. Go to System Settings > Privacy & Security > Microphone and allow it.
 
-### Option B — Menu bar app (build from source)
+### Option B — Menu bar app (pre-built)
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/mstovicek/macos-mic-keepwarm/master/install-app.sh | bash
+```
+
+Downloads the precompiled universal binary, installs it to `~/.local/bin/mic-warm-app`, and creates a LaunchAgent with the same auto-start/restart behavior as the daemon.
+
+**Or build from source** (requires Xcode Command Line Tools — `xcode-select --install`):
 
 ```bash
 git clone https://github.com/mstovicek/macos-mic-keepwarm.git
@@ -112,15 +120,13 @@ cd macos-mic-keepwarm
 bash install-local.sh
 ```
 
-Builds `mic-warm-app` locally with `swift build`, installs it to `~/.local/bin/mic-warm-app`, and registers a LaunchAgent. Requires Xcode Command Line Tools (`xcode-select --install`).
-
 The menu bar icon shows `mic.fill` when warm and `mic.slash.fill` when cold. Click it to toggle, or open the menu to see the current state and quit.
 
 ### Upgrade
 
 **Daemon:** re-run `install.sh`. The script re-signs the binary and reloads the LaunchAgent. Don't replace the binary manually — macOS tracks mic permissions by code signature and will silently reject an unsigned replacement.
 
-**Menu bar app:** pull the latest changes and re-run `install-local.sh`.
+**Menu bar app:** re-run `install-app.sh` (or `install-local.sh` if you built from source).
 
 ### Uninstall
 

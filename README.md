@@ -85,7 +85,7 @@ When you connect or disconnect AirPods, a Bluetooth headset, or any audio device
 | **UI** | None | Menu bar icon with toggle |
 | **Control** | Always on, `launchctl` to stop | Click to turn on/off |
 | **State** | Restarts automatically | Remembers last on/off state |
-| **Install** | `install.sh` (pre-built binary) | `install-local.sh` (builds from source) |
+| **Install** | `install.sh` (pre-built binary) | `install-dev.sh` (builds from source) |
 
 Both use the same underlying session logic. Choose the daemon if you want zero overhead and never need to toggle. Choose the menu bar app if you want to turn it off occasionally (e.g. when Bluetooth audio quality matters more than push-to-talk latency).
 
@@ -117,7 +117,7 @@ Downloads the precompiled universal binary, installs it to `~/.local/bin/mic-war
 ```bash
 git clone https://github.com/mstovicek/macos-mic-keepwarm.git
 cd macos-mic-keepwarm
-bash install-local.sh
+bash install-dev.sh
 ```
 
 The menu bar icon shows `mic.fill` when warm and `mic.slash.fill` when cold. Click it to toggle, or open the menu to see the current state and quit.
@@ -126,7 +126,7 @@ The menu bar icon shows `mic.fill` when warm and `mic.slash.fill` when cold. Cli
 
 **Daemon:** re-run `install.sh`. The script re-signs the binary and reloads the LaunchAgent. Don't replace the binary manually — macOS tracks mic permissions by code signature and will silently reject an unsigned replacement.
 
-**Menu bar app:** re-run `install-app.sh` (or `install-local.sh` if you built from source).
+**Menu bar app:** re-run `install-app.sh` (or `install-dev.sh` if you built from source).
 
 ### Uninstall
 

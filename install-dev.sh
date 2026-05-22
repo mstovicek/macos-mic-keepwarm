@@ -1,23 +1,29 @@
 #!/bin/bash
-# install-local.sh
-# Builds mic-warm from source and installs as a persistent LaunchAgent.
-# Run from the repo root: bash install-local.sh
+# install-dev.sh
+# Builds mic-warm-app from source and installs as a persistent LaunchAgent.
+# For local development and testing. End users should use install-app.sh instead.
+# Run from the repo root: bash install-dev.sh
 
 set -e
 
 BIN_DIR="$HOME/.local/bin"
-BIN_PATH="$BIN_DIR/mic-warm"
+BIN_PATH="$BIN_DIR/mic-warm-app"
 PLIST_PATH="$HOME/Library/LaunchAgents/com.user.keep-mic-warm.plist"
 REPO_DIR="$(cd "$(dirname "$0")" && pwd)"
 
-echo "Building mic-warm..."
+echo "Building mic-warm-app..."
 cd "$REPO_DIR"
 swift build -c release 2>&1
 
-BUILT_BIN="$REPO_DIR/.build/release/mic-warm"
+BUILT_BIN="$REPO_DIR/.build/apple/Products/Release/mic-warm-app"
+# Fallback for non-universal builds (e.g. swift build without --arch flags)
+if [ ! -f "$BUILT_BIN" ]; then
+    BUILT_BIN="$REPO_DIR/.build/release/mic-warm-app"
+fi
 
 # Stop any running instance
 launchctl unload "$PLIST_PATH" 2>/dev/null || true
+pkill -x mic-warm-app 2>/dev/null || true
 pkill -x mic-warm 2>/dev/null || true
 sleep 0.5
 
@@ -55,10 +61,10 @@ launchctl load "$PLIST_PATH"
 
 echo ""
 echo "Installed and running."
-echo "The mic-warm menu bar icon should appear shortly."
+echo "The mic-warm-app menu bar icon should appear shortly."
 echo ""
 echo "If you haven't granted mic access yet:"
-echo "  System Settings > Privacy & Security > Microphone > allow mic-warm"
+echo "  System Settings > Privacy & Security > Microphone > allow mic-warm-app"
 echo ""
 echo "Log file: /tmp/mic-warm.log"
 echo "To uninstall: bash $REPO_DIR/uninstall.sh"
